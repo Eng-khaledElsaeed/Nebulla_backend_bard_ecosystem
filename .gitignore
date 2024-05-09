@@ -1,0 +1,5 @@
+gen-lang-client-*.json
+
+*.pem
+*.key
+.env
