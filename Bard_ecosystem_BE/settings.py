@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -31,6 +31,8 @@ PAML_API_KEY = 'AIzaSyA8Qu84i-h089LAHpbmARw_YRUrzoF3Zoc'
 DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+
+CSRF_TRUSTED_ORIGINS = ["http://*.on-acorn.io", "https://*.on-acorn.io"]
 
 
 # Application definition
@@ -92,6 +94,18 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+
+#DATABASES = {
+#    "default": {
+#        "ENGINE": "django.db.backends.mysql",
+#        "NAME": os.getenv("MARIADB_DATABASE"),
+#        "USER": os.getenv("MARIADB_USER"),
+#        "PASSWORD": os.getenv("MARIADB_ROOT_PASSWORD"),
+#        "HOST": os.getenv("MARIADB_HOST"),
+#        "PORT": os.getenv("MARIADB_PORT", 3306),
+#    }
+#}
 
 
 # Password validation
