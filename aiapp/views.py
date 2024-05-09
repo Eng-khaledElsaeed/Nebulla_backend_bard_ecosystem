@@ -62,7 +62,8 @@ class StartInteractionView(APIView):
             # Get the response including the provided image
             response_data = get_response(user_chat, image=image)
             response_chat = response_data['response']
-            request.data['title'] = generate_title(user_chat)
+            #generated_title = generate_title(user_chat)
+            generated_title = generate_title_using_bard(user_chat)['response']
             interaction_type = request.data.get('interaction_type')
             title = request.data.get('title')
             if not user_chat:
@@ -72,7 +73,7 @@ class StartInteractionView(APIView):
                     user=User.objects.get(id=user_id)
                     # Create a new UserInteractionCollection object.
                     collection = UserInteractionCollection.objects.create(
-                        title=title, 
+                        title=generated_title, 
                         creator=user
                     )
                     # Create a new Interaction object with provided data.
@@ -107,12 +108,9 @@ class StartInteractionWithCollectionIdView(APIView):
             user_id=auth_result['user_token_data']['user_id']
             user_chat = request.data.get('user_chat')
             image = request.FILES.get('image')
-            # Get the response including the provided image
             response_data =get_response(user_chat, image=image)
             response_chat = response_data['response']
-            request.data['title'] = generate_title(user_chat)
             interaction_type = request.data.get('interaction_type')
-            title = request.data.get('title')
             if not user_chat:
                 return Response({'error': 'Missing user_chat field'}, status=status.HTTP_400_BAD_REQUEST)
             else: 
