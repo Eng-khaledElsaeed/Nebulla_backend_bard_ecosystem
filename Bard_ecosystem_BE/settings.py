@@ -12,6 +12,11 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+from dotenv import load_dotenv
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -32,12 +37,14 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
-CSRF_TRUSTED_ORIGINS = ["http://*.on-acorn.io", "https://*.on-acorn.io"]
+#CSRF_TRUSTED_ORIGINS = ["http://*.on-acorn.io", "https://*.on-acorn.io"]
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'cloudinary_storage',
+    'cloudinary',
     'corsheaders',
     'rest_framework',
     'user.apps.UserConfig',
@@ -51,6 +58,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -105,6 +113,22 @@ DATABASES = {
 #        "HOST": os.getenv("MARIADB_HOST"),
 #        "PORT": os.getenv("MARIADB_PORT", 3306),
 #    }
+#}
+
+MEDIA_URL = '/media/'
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+cloudinary.config( 
+  	cloud_name = "drq6ck6u2",
+  	api_key = "192149627873917",
+  	api_secret = "K-WPuF0Qv0TcphpnRs0WK2FKrtU"
+)
+
+
+#CLOUDINARY_STORAGE = {
+#    'CLOUD_NAME': 'drq6ck6u2',
+#    'API_KEY': '192149627873917',
+#    'API_SECRET': 'K-WPuF0Qv0TcphpnRs0WK2FKrtU',
 #}
 
 

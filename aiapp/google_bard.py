@@ -31,6 +31,7 @@ def get_response(prompt, image=None):
                                                   )
             else:
                 chat =  model.start_chat(history=[])
+                prompt=prompt.replace('"', '')
                 response =  chat.send_message(prompt)
                 #response = model.generate_content([prompt], generation_config=genai.types.GenerationConfig(
                 #    candidate_count=1,
@@ -62,7 +63,7 @@ def generate_title_using_bard(prompt):
 
     for attempt in range(max_retries):
         try:
-            
+            prompt=prompt.replace('"', '')
             chat =  model.start_chat(history=[])
             response =  chat.send_message(
                 "please can you generate a title of a maximum three words suitable for this content : " + prompt

@@ -5,6 +5,7 @@ import json
 #models
 from .models import UserInteractionCollection
 from .models import Interaction
+from .models import ImageUpload
 from user.models import User
 # serilaizer
 from .serializers import UserInteractionCollectionSerializer
@@ -13,7 +14,8 @@ from .serializers import InteractionSerializer
 from .google_bard import *
 from Bard_ecosystem_BE.utils.utility import encrypt_token,is_user_authenticated
 from Bard_ecosystem_BE.utils.aiapp_utility import generate_title
-
+import cloudinary.uploader
+from cloudinary.uploader import upload_image
 # -------- get --------
 
 class UserlistColectionsView(APIView):
@@ -57,7 +59,7 @@ class StartInteractionView(APIView):
         auth_result, is_authenticated = is_user_authenticated(request)
         if is_authenticated:
             user_id=auth_result['user_token_data']['user_id']
-            user_chat = request.data.get('user_chat')
+            user_chat = request.data.get('user_chat').replace('"', '')
             image = request.FILES.get('image')
             # Get the response including the provided image
             response_data = get_response(user_chat, image=image)
@@ -106,11 +108,12 @@ class StartInteractionWithCollectionIdView(APIView):
         auth_result, is_authenticated = is_user_authenticated(request)
         if is_authenticated:
             user_id=auth_result['user_token_data']['user_id']
-            user_chat = request.data.get('user_chat')
-            image = request.FILES.get('image')
+            user_chat = request.data.get('user_chat').replace('"', '')
+            image = request.FILES['image'].read()
             response_data =get_response(user_chat, image=image)
             response_chat = response_data['response']
             interaction_type = request.data.get('interaction_type')
+                
             if not user_chat:
                 return Response({'error': 'Missing user_chat field'}, status=status.HTTP_400_BAD_REQUEST)
             else: 
@@ -120,20 +123,49 @@ class StartInteractionWithCollectionIdView(APIView):
                     return Response({"Message":"this interactions collection not found"},status=status.HTTP_404_NOT_FOUND)
                 if collection:
                     try:
+                        #if image:
+                        #    # Upload image to Cloudinary
+                            
+                        #    # Process image here if needed
+                        #    image_bytes = image.read()
+                        #    # Open the image using PIL
+                        #    image_pil = PIL.Image.open(BytesIO(image_bytes))
+                        #    print(image_pil)
+                            
+                        #    upload_result = upload_image(image_pil)
+                        #    print(upload_result)
+                        #    image_url = upload_result['url']
+
+                        #    # Create interaction with image URL
+                        #    interaction = Interaction.objects.create(
+                        #        user_chat=user_chat,
+                        #        response_chat=response_chat,
+                        #        interaction_collection=collection,
+                        #        image=image_url,
+                        #        interaction_type=interaction_type,
+                        #    )
+                        #else:
+                        #    # Create interaction without image
+                        #    interaction = Interaction.objects.create(
+                        #        user_chat=user_chat,
+                        #        response_chat=response_chat,
+                        #        interaction_collection=collection,
+                        #        interaction_type=interaction_type,
+                        #    )
+                        
+                        # Open the image using PIL
+                        image_pil = PIL.Image.open(BytesIO(image))
+                        imageuploaded = cloudinary.uploader.upload(image_pil)
                         interaction = Interaction.objects.create(
-                            user_chat = user_chat, 
+                            user_chat=user_chat,
                             response_chat=response_chat,
                             interaction_collection=collection,
-                            #interaction_type=interaction_type, 
                         )
-                        
-                        
-                        # Serialize the Interaction object for response.
                         interaction_serializer = InteractionSerializer(interaction)
                         return Response({
-                            #'collection':collection.data,
                             'interaction': interaction_serializer.data
                         }, status=status.HTTP_201_CREATED)
+                        
                     except UserInteractionCollection.DoesNotExist:
                         return Response({"Message":"failed to create new interaction"},status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                 else:
@@ -142,7 +174,37 @@ class StartInteractionWithCollectionIdView(APIView):
             # Handle unauthenticated requests
             return Response({'message':auth_result['message'] }, status=auth_result['status'])
        
-    
+       
+from django.shortcuts import render, HttpResponseRedirect
+from django.core.exceptions import ValidationError
+from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.response import Response
+from rest_framework import status
+import cloudinary.uploader
+
+class ImageUploadView(APIView):
+    #parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request):
+        try:
+            # Access the uploaded image file from the request
+            image_file = request.FILES['image']
+
+            # Upload the image to Cloudinary using your credentials
+            upload_result = cloudinary.uploader.upload(image_file)
+            image_url = upload_result["url"]
+
+            # Create a new ImageUpload model instance with the URL
+            image_upload = ImageUpload(image_url=image_url)
+            image_upload.save()
+
+            return Response({'message': 'Image uploaded successfully!', 'url': image_url}, status=status.HTTP_201_CREATED)
+
+        except (KeyError, ValidationError):
+            return HttpResponseRedirect('Invalid request data or image format')
+        except cloudinary.exceptions.Error as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
 class generatetitle(APIView):
     def post(self, request):

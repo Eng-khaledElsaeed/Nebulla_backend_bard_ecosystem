@@ -1,5 +1,7 @@
 from django.urls import path
-from .views import UserlistColectionsView,UserlistInteractionsView,StartInteractionView,StartInteractionWithCollectionIdView,generatetitle
+from .views import UserlistColectionsView,UserlistInteractionsView
+from .views import StartInteractionView,StartInteractionWithCollectionIdView,generatetitle
+from .views import ImageUploadView
 
 urlpatterns=[
 #--------- get -----------
@@ -13,6 +15,7 @@ urlpatterns=[
  
 
     path('generatetitle/', generatetitle.as_view(), name='generatetitle'),
+    path('upload-image/', ImageUploadView.as_view(), name='upload_image')
     
     
     #path('getAllInteractions/', views.get__all_users_interaction, name='get__all_users_interaction'),
