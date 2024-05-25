@@ -13,7 +13,7 @@ from .serializers import InteractionSerializer
 #utility
 from .google_bard import *
 from Bard_ecosystem_BE.utils.utility import encrypt_token,is_user_authenticated
-from Bard_ecosystem_BE.utils.aiapp_utility import generate_title
+#from Bard_ecosystem_BE.utils.aiapp_utility import generate_title
 import cloudinary.uploader
 from cloudinary.uploader import upload_image
 # -------- get --------
@@ -175,40 +175,40 @@ class StartInteractionWithCollectionIdView(APIView):
             return Response({'message':auth_result['message'] }, status=auth_result['status'])
        
        
-from django.shortcuts import render, HttpResponseRedirect
-from django.core.exceptions import ValidationError
-from rest_framework.views import APIView
-from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.response import Response
-from rest_framework import status
-import cloudinary.uploader
+#from django.shortcuts import render, HttpResponseRedirect
+#from django.core.exceptions import ValidationError
+#from rest_framework.views import APIView
+#from rest_framework.parsers import MultiPartParser, FormParser
+#from rest_framework.response import Response
+#from rest_framework import status
+#import cloudinary.uploader
 
-class ImageUploadView(APIView):
-    #parser_classes = [MultiPartParser, FormParser]
+#class ImageUploadView(APIView):
+#    #parser_classes = [MultiPartParser, FormParser]
 
-    def post(self, request):
-        try:
-            # Access the uploaded image file from the request
-            image_file = request.FILES['image']
+#    def post(self, request):
+#        try:
+#            # Access the uploaded image file from the request
+#            image_file = request.FILES['image']
 
-            # Upload the image to Cloudinary using your credentials
-            upload_result = cloudinary.uploader.upload(image_file)
-            image_url = upload_result["url"]
+#            # Upload the image to Cloudinary using your credentials
+#            upload_result = cloudinary.uploader.upload(image_file)
+#            image_url = upload_result["url"]
 
-            # Create a new ImageUpload model instance with the URL
-            image_upload = ImageUpload(image_url=image_url)
-            image_upload.save()
+#            # Create a new ImageUpload model instance with the URL
+#            image_upload = ImageUpload(image_url=image_url)
+#            image_upload.save()
 
-            return Response({'message': 'Image uploaded successfully!', 'url': image_url}, status=status.HTTP_201_CREATED)
+#            return Response({'message': 'Image uploaded successfully!', 'url': image_url}, status=status.HTTP_201_CREATED)
 
-        except (KeyError, ValidationError):
-            return HttpResponseRedirect('Invalid request data or image format')
-        except cloudinary.exceptions.Error as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+#        except (KeyError, ValidationError):
+#            return HttpResponseRedirect('Invalid request data or image format')
+#        except cloudinary.exceptions.Error as e:
+#            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
-class generatetitle(APIView):
-    def post(self, request):
-       generate_title("hello nebula can you help me please?")
+#class generatetitle(APIView):
+#    def post(self, request):
+#       generate_title("hello nebula can you help me please?")
     
 
 

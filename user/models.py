@@ -32,4 +32,17 @@ class User(models.Model):
 
     def __str__(self):
         return self.username
+
+
+class UserLevelState(models.Model):
+    user = models.ForeignKey(User , on_delete=models.CASCADE)
+    level_1 = models.BooleanField(default=False)         
+    level_2 = models.BooleanField(default=False)          
+    level_3 = models.BooleanField(default=False)          
     
+    def changeLevelStateActive(self,level_num):
+        # Check if the level_num attribute exists
+        level_attr = f"level_{level_num}"
+        if hasattr(self, level_attr):
+            setattr(self, level_attr, True)
+            self.save()
